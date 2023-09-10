@@ -45,8 +45,7 @@ export const LIST_CHECKBOX_TEST_MODEL_CONFIG = {
   placeholder: 'Programme',
   readOnly: false,
   required: false,
-  repeatable: true,
-  hint: 'hint',
+  repeatable: true
 };
 
 export const LIST_RADIO_TEST_MODEL_CONFIG = {

@@ -151,9 +151,7 @@ describe('DsDynamicFormControlContainerComponent test suite', () => {
     new DynamicListCheckboxGroupModel({
       id: 'checkboxList',
       vocabularyOptions: vocabularyOptions,
-      repeatable: true,
-      hint: 'test hint',
-      required: false
+      repeatable: true
     }),
     new DynamicListRadioGroupModel({
       id: 'radioList',

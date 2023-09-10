@@ -1,13 +1,10 @@
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { Router } from '@angular/router';
 
 import { provideMockActions } from '@ngrx/effects/testing';
 import { Store, StoreModule } from '@ngrx/store';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
-import { cold, getTestScheduler, hot } from 'jasmine-marbles';
+import { cold, hot } from 'jasmine-marbles';
 import { Observable, of as observableOf, throwError as observableThrow } from 'rxjs';
-import { take } from 'rxjs/operators';
-import { TestScheduler } from 'rxjs/testing';
 
 import { AuthEffects } from './auth.effects';
 import {
@@ -41,8 +38,9 @@ import { AppState, storeModuleConfig } from '../../app.reducer';
 import { StoreActionTypes } from '../../store.actions';
 import { isAuthenticated, isAuthenticatedLoaded } from './selectors';
 import { AuthorizationDataService } from '../data/feature-authorization/authorization-data.service';
+import { Router } from '@angular/router';
 import { RouterStub } from '../../shared/testing/router.stub';
-
+import { take } from 'rxjs/operators';
 
 describe('AuthEffects', () => {
   let authEffects: AuthEffects;
@@ -54,7 +52,6 @@ describe('AuthEffects', () => {
   let routerStub;
   let redirectUrl;
   let authStatus;
-  let scheduler: TestScheduler;
 
   const authorizationService = jasmine.createSpyObj(['invalidateAuthorizationsRequestCache']);
 
@@ -487,22 +484,18 @@ describe('AuthEffects', () => {
   });
 
   describe('refreshTokenAndRedirectSuccess$', () => {
-
-    beforeEach(() => {
-      scheduler = getTestScheduler();
-    });
-
-    it('should replace token and redirect in response to a REFRESH_TOKEN_AND_REDIRECT_SUCCESS action', () => {
+    it('should replace token and redirect in response to a REFRESH_TOKEN_AND_REDIRECT_SUCCESS action', (done) => {
 
       actions = hot('--a-', { a: { type: AuthActionTypes.REFRESH_TOKEN_AND_REDIRECT_SUCCESS, payload: {token, redirectUrl} } });
 
       spyOn(authServiceStub, 'replaceToken');
+      spyOn(routerStub, 'navigateByUrl');
 
-      scheduler.run(() => authEffects.refreshTokenAndRedirectSuccess$.pipe(take(1)).subscribe());
-      scheduler.flush();
-
-      expect(authServiceStub.replaceToken).toHaveBeenCalledWith(token);
-      expect(routerStub.navigate).toHaveBeenCalledWith([redirectUrl]);
+      authEffects.refreshTokenAndRedirectSuccess$.pipe(take(1)).subscribe(() => {
+        expect(authServiceStub.replaceToken).toHaveBeenCalledWith(token);
+        expect(routerStub.navigateByUrl).toHaveBeenCalledWith(redirectUrl);
+      });
+      done();
     });
   });
 

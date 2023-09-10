@@ -53,21 +53,16 @@ export class SubmissionFormCollectionComponent implements OnChanges, OnInit {
   @Input() currentDefinition: string;
 
   /**
-   * The entity type input used to create a new submission
-   * @type {string}
-   */
-  @Input() entityType: string;
-
-  /**
    * The submission id
    * @type {string}
    */
   @Input() submissionId;
 
   /**
-   * Flag to indicate if the submission dropdown is read only
+   * The entity type input used to create a new submission
+   * @type {string}
    */
-  @Input() isReadonly = false;
+  @Input() entityType: string;
 
   /**
    * An event fired when a different collection is selected.

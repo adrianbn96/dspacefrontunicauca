@@ -14,7 +14,6 @@ import {
   HostListener,
   Input,
   OnChanges,
-  OnDestroy,
   Output,
   Renderer2,
   SimpleChanges,
@@ -37,7 +36,7 @@ import { VocabularyEntryDetail } from '../../../core/submission/vocabularies/mod
 @Directive({
   selector: '[dsAuthorityConfidenceState]'
 })
-export class AuthorityConfidenceStateDirective implements OnChanges, AfterViewInit, OnDestroy {
+export class AuthorityConfidenceStateDirective implements OnChanges, AfterViewInit {
 
   /**
    * The metadata value
@@ -48,11 +47,6 @@ export class AuthorityConfidenceStateDirective implements OnChanges, AfterViewIn
    * A boolean representing if to show html icon if authority value is empty
    */
   @Input() visibleWhenAuthorityEmpty = true;
-
-  /**
-   * A boolean representing if to show html icon if authority value is empty
-   */
-  @Input() showTooltip = true;
 
   /**
    * The css class applied before directive changes
@@ -68,11 +62,6 @@ export class AuthorityConfidenceStateDirective implements OnChanges, AfterViewIn
    * An event fired when click on element that has a confidence value empty or different from CF_ACCEPTED
    */
   @Output() whenClickOnConfidenceNotAccepted: EventEmitter<ConfidenceType> = new EventEmitter<ConfidenceType>();
-
-  /**
-   * Listener to hover event
-   */
-  private onHoverUnsubscribe: () => void;
 
   /**
    * Listener to click event
@@ -102,7 +91,7 @@ export class AuthorityConfidenceStateDirective implements OnChanges, AfterViewIn
   /**
    * Listener to hover event
    */
-  onHover() {
+  @HostListener('mouseover') onHover() {
     this.renderer.setAttribute(
       this.elem.nativeElement,
       'title',
@@ -127,21 +116,6 @@ export class AuthorityConfidenceStateDirective implements OnChanges, AfterViewIn
       this.renderer.removeClass(this.elem.nativeElement, this.previousClass);
       this.renderer.addClass(this.elem.nativeElement, this.newClass);
     }
-
-    if (this.showTooltip && this.onHoverUnsubscribe == null) {
-      this.listenOnMouseOver();
-    }
-
-    if (!changes.showTooltip?.firstChange && !!changes.showTooltip?.currentValue) {
-      if (this.onHoverUnsubscribe != null) {
-        this.onHoverUnsubscribe();
-      }
-      this.listenOnMouseOver();
-    }
-  }
-
-  private listenOnMouseOver() {
-    this.onHoverUnsubscribe = this.renderer.listen(this.elem.nativeElement, 'mouseover', () => this.onHover());
   }
 
   /**
@@ -188,18 +162,12 @@ export class AuthorityConfidenceStateDirective implements OnChanges, AfterViewIn
 
     const confidenceIcons: ConfidenceIconConfig[] = environment.submission.icons.authority.confidence;
 
-    const confidenceIndex: number = findIndex(confidenceIcons, { value: confidence });
+    const confidenceIndex: number = findIndex(confidenceIcons, {value: confidence});
 
-    const defaultConfidenceIndex: number = findIndex(confidenceIcons, { value: 'default' as any });
+    const defaultConfidenceIndex: number = findIndex(confidenceIcons, {value: 'default' as any});
     const defaultClass: string = (defaultConfidenceIndex !== -1) ? confidenceIcons[defaultConfidenceIndex].style : '';
 
     return (confidenceIndex !== -1) ? confidenceIcons[confidenceIndex].style : defaultClass;
-  }
-
-  public ngOnDestroy() {
-    if (this.onHoverUnsubscribe != null) {
-      this.onHoverUnsubscribe();
-    }
   }
 
 }

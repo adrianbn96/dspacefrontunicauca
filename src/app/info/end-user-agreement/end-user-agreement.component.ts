@@ -1,14 +1,15 @@
-import { LogOutAction, RefreshTokenAndRedirectAction } from '../../core/auth/auth.actions';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { RefreshTokenAndRedirectAction } from './../../core/auth/auth.actions';
+import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../core/auth/auth.service';
 import { map, switchMap, take } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../app.reducer';
+import { LogOutAction } from '../../core/auth/auth.actions';
 import { EndUserAgreementService } from '../../core/end-user-agreement/end-user-agreement.service';
 import { NotificationsService } from '../../shared/notifications/notifications.service';
 import { TranslateService } from '@ngx-translate/core';
-import { combineLatest, of as observableOf, Subscription } from 'rxjs';
+import { of as observableOf, combineLatest } from 'rxjs';
 import { isNotEmpty } from '../../shared/empty.util';
 
 @Component({
@@ -19,7 +20,7 @@ import { isNotEmpty } from '../../shared/empty.util';
 /**
  * Component displaying the End User Agreement and an option to accept it
  */
-export class EndUserAgreementComponent implements OnInit, OnDestroy {
+export class EndUserAgreementComponent implements OnInit {
 
   /**
    * Whether or not the user agreement has been accepted
@@ -30,15 +31,13 @@ export class EndUserAgreementComponent implements OnInit, OnDestroy {
    */
   alreadyAccepted = false;
 
-  private subscription: Subscription = new Subscription();
-
   constructor(protected endUserAgreementService: EndUserAgreementService,
-              protected notificationsService: NotificationsService,
-              protected translate: TranslateService,
-              protected authService: AuthService,
-              protected store: Store<AppState>,
-              protected router: Router,
-              protected route: ActivatedRoute) {
+    protected notificationsService: NotificationsService,
+    protected translate: TranslateService,
+    protected authService: AuthService,
+    protected store: Store<AppState>,
+    protected router: Router,
+    protected route: ActivatedRoute) {
   }
 
   /**
@@ -53,25 +52,20 @@ export class EndUserAgreementComponent implements OnInit, OnDestroy {
    * If no user is logged in, should not show the form
    */
   initAccepted() {
-    this.subscription.add(
-      combineLatest([
-        this.endUserAgreementService.hasCurrentUserOrCookieAcceptedAgreement(false),
-        this.authService.isAuthenticated()
-      ])
-        .subscribe(([accepted, authorized]) => {
-          if (authorized) {
+    combineLatest(this.endUserAgreementService.hasCurrentUserOrCookieAcceptedAgreement(false), this.authService.isAuthenticated())
+      .subscribe(([accepted, authorized]) => {
+        if (authorized) {
 
-            if (!accepted) {
-              this.notificationsService.warning(this.translate.instant('info.end-user-agreement.accept.warning'));
-            }
-            this.accepted = accepted;
-            this.alreadyAccepted = accepted;
-
-          } else {
-            this.alreadyAccepted = true;
+          if (!accepted) {
+            this.notificationsService.warning(this.translate.instant('info.end-user-agreement.accept.warning'));
           }
-        })
-    );
+          this.accepted = accepted;
+          this.alreadyAccepted = accepted;
+
+        } else {
+          this.alreadyAccepted = true;
+        }
+      });
   }
 
   /**
@@ -110,10 +104,6 @@ export class EndUserAgreementComponent implements OnInit, OnDestroy {
         this.router.navigate(['home']);
       }
     });
-  }
-
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
   }
 
 }

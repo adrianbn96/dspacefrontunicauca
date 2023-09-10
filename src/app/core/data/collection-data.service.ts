@@ -18,7 +18,7 @@ import { COLLECTION } from '../shared/collection.resource-type';
 import { ContentSource } from '../shared/content-source.model';
 import { HALEndpointService } from '../shared/hal-endpoint.service';
 import { Item } from '../shared/item.model';
-import { getAllCompletedRemoteData, getFirstCompletedRemoteData } from '../shared/operators';
+import { getFirstCompletedRemoteData } from '../shared/operators';
 import { ComColDataService } from './comcol-data.service';
 import { CommunityDataService } from './community-data.service';
 import { DSOChangeAnalyzer } from './dso-change-analyzer.service';
@@ -77,8 +77,7 @@ export class CollectionDataService extends ComColDataService<Collection> {
     });
 
     return this.searchBy(searchHref, options, useCachedVersionIfAvailable, reRequestOnStale, ...linksToFollow).pipe(
-      getAllCompletedRemoteData(),
-    );
+      filter((collections: RemoteData<PaginatedList<Collection>>) => !collections.isResponsePending));
   }
 
   /**
@@ -99,8 +98,7 @@ export class CollectionDataService extends ComColDataService<Collection> {
     });
 
     return this.searchBy(searchHref, options, true, reRequestOnStale, ...linksToFollow).pipe(
-      getAllCompletedRemoteData(),
-    );
+      filter((collections: RemoteData<PaginatedList<Collection>>) => !collections.isResponsePending));
   }
 
   /**
@@ -126,8 +124,7 @@ export class CollectionDataService extends ComColDataService<Collection> {
     });
 
     return this.searchBy(searchHref, options, true, reRequestOnStale, ...linksToFollow).pipe(
-      getAllCompletedRemoteData(),
-    );
+      filter((collections: RemoteData<PaginatedList<Collection>>) => !collections.isResponsePending));
   }
 
   /**
@@ -157,8 +154,7 @@ export class CollectionDataService extends ComColDataService<Collection> {
     });
 
     return this.searchBy(searchHref, options, true, reRequestOnStale, ...linksToFollow).pipe(
-      getAllCompletedRemoteData()
-    );
+      filter((collections: RemoteData<PaginatedList<Collection>>) => !collections.isResponsePending));
   }
 
   /**
@@ -182,8 +178,7 @@ export class CollectionDataService extends ComColDataService<Collection> {
     });
 
     return this.searchBy(searchHref, options, reRequestOnStale).pipe(
-      getAllCompletedRemoteData()
-    );
+      filter((collections: RemoteData<PaginatedList<Collection>>) => !collections.isResponsePending));
   }
   /**
    * Get all collections the user is authorized to submit to, by community and has the metadata
@@ -214,8 +209,7 @@ export class CollectionDataService extends ComColDataService<Collection> {
     });
 
     return this.searchBy(searchHref, options, true, reRequestOnStale, ...linksToFollow).pipe(
-      getAllCompletedRemoteData()
-    );
+      filter((collections: RemoteData<PaginatedList<Collection>>) => !collections.isResponsePending));
   }
 
   /**
@@ -230,7 +224,8 @@ export class CollectionDataService extends ComColDataService<Collection> {
     options.elementsPerPage = 1;
 
     return this.searchBy(searchHref, options).pipe(
-      getAllCompletedRemoteData(),
+      filter((collections: RemoteData<PaginatedList<Collection>>) => !collections.isResponsePending),
+      take(1),
       map((collections: RemoteData<PaginatedList<Collection>>) => collections.payload.totalElements > 0)
     );
   }

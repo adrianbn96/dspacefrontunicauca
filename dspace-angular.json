@@ -1,0 +1,14 @@
+{
+    "apps": [
+        {
+           "name": "dspace-angular",
+           "cwd": "C:\\dspace-angular-dspace-cris-2023.01.00",
+           "script": "dist\\server\\main.js",
+           "instances": "max",
+           "exec_mode": "cluster",
+           "env": {
+              "NODE_ENV": "production"
+           }
+        }
+    ]
+}
